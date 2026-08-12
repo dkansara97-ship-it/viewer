@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Clean HTML Viewer</title>
     <style>
         * { box-sizing: border-box; }
@@ -18,18 +18,21 @@
             background: #ffffff; 
         }
         
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
         #controls { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             padding: 12px 16px;
             background: #2c2c2e; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             border-bottom: 1px solid #3a3a3c; 
-            z-index: 1000;
+            flex-shrink: 0;
         }
         
         .btn { 
@@ -46,14 +49,10 @@
         #file-input { display: none; }
         
         #viewer-frame { 
-            position: fixed;
-            top: 0;
-            left: 0;
+            flex: 1;
             width: 100%;
-            height: 100%;
             border: none; 
             background: #ffffff; 
-            z-index: 1;
         }
         
         #secret-trigger {
@@ -70,12 +69,14 @@
     </style>
 </head>
 <body>
-    <div id="controls">
-        <label for="file-input" class="btn">Open HTML File</label>
-        <input type="file" id="file-input" accept=".html,.htm">
-    </div>
+    <div id="app-container">
+        <div id="controls">
+            <label for="file-input" class="btn">Open HTML File</label>
+            <input type="file" id="file-input" accept=".html,.htm">
+        </div>
 
-    <iframe id="viewer-frame"></iframe>
+        <iframe id="viewer-frame"></iframe>
+    </div>
 
     <div id="secret-trigger" onclick="toggleHeader(true)"></div>
 
