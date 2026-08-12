@@ -2,32 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Interactive HTML Viewer</title>
+    <title>Clean HTML Viewer</title>
     <style>
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #000; }
         #app-container { display: flex; flex-direction: column; width: 100vw; height: 100vh; }
-        #controls { padding: 10px 16px; background: #2c2c2e; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #3a3a3c; }
+        
+        #controls { 
+            padding: calc(10px + env(safe-area-inset-top)) 16px 10px 16px; /* Handles iPad notch/status bar */
+            background: #2c2c2e; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-bottom: 1px solid #3a3a3c; 
+            position: relative;
+            z-index: 10;
+        }
+        
         .btn { padding: 8px 16px; background: #0a84ff; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
         #file-input { display: none; }
-        #viewer-frame { flex: 1; border: none; width: 100%; height: 100%; background: white; }
+        #viewer-frame { flex: 1; border: none; width: 100%; height: 100%; background: white; z-index: 1; }
         
-        /* Floating toggle button when header is hidden */
-        #show-btn {
-            display: none;
+        /* The invisible trigger zone */
+        #secret-trigger {
+            display: none; /* Hidden until a file loads */
             position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 99999;
-            padding: 6px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
+            top: 0;
+            right: 0;
+            width: 80px; /* Area size */
+            height: 80px;
+            background: transparent; /* Totally invisible */
+            z-index: 99999; /* Always on top */
+            cursor: pointer;
         }
     </style>
 </head>
@@ -36,23 +45,23 @@
         <div id="controls">
             <label for="file-input" class="btn">Open HTML File</label>
             <input type="file" id="file-input" accept=".html,.htm">
-            <button id="hide-btn" class="btn" style="background: #3a3a3c;" onclick="toggleHeader(false)">Hide Bar</button>
         </div>
         <iframe id="viewer-frame"></iframe>
     </div>
 
-    <button id="show-btn" onclick="toggleHeader(true)">Open File</button>
+    <!-- The invisible area you tap to show the menu -->
+    <div id="secret-trigger" onclick="toggleHeader(true)"></div>
 
     <script>
         function toggleHeader(show) {
             const controls = document.getElementById('controls');
-            const showBtn = document.getElementById('show-btn');
+            const trigger = document.getElementById('secret-trigger');
             if (show) {
                 controls.style.display = 'flex';
-                showBtn.style.display = 'none';
+                trigger.style.display = 'none'; // Hide trigger while menu is visible
             } else {
                 controls.style.display = 'none';
-                showBtn.style.display = 'block';
+                trigger.style.display = 'block'; // Show trigger when menu is hidden
             }
         }
 
@@ -63,7 +72,9 @@
                 reader.onload = function(evt) {
                     const blob = new Blob([evt.target.result], { type: 'text/html' });
                     document.getElementById('viewer-frame').src = URL.createObjectURL(blob);
-                    toggleHeader(false); // Automatically hides the bar upon loading a file
+                    
+                    // Hide the menu and activate the secret corner trigger
+                    toggleHeader(false); 
                 };
                 reader.readAsText(file);
             }
